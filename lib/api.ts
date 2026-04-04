@@ -127,6 +127,7 @@ export const adminAPI = {
   updateUserRole: (id: string, role: string) =>
     api.put(`/admin/users/${id}/role`, { role }),
   deactivateUser: (id: string) => api.put(`/admin/users/${id}/deactivate`),
+  activateUser: (id: string) => api.put(`/admin/users/${id}/activate`),
   createAnnouncement: (data: any) => api.post("/admin/announcements", data),
   getAnnouncements: (filters: any = {}) =>
     api.get("/admin/announcements", { params: filters }),

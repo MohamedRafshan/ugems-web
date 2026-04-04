@@ -90,16 +90,6 @@ export default function AdminLoginPage() {
             />
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900">
-            <p className="font-semibold mb-1">Demo Credentials:</p>
-            <p>
-              Email: <code className="bg-white px-1">ugems@gmail.com</code>
-            </p>
-            <p>
-              Password: <code className="bg-white px-1">ugems@123</code>
-            </p>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
