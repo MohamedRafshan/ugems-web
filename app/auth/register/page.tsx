@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 
@@ -17,6 +18,7 @@ export default function RegisterPage() {
     nicNumber: "",
     alBatch: "",
     school: "",
+    phoneNumber: "",
   });
   const [localError, setLocalError] = useState("");
   const [indexNumber, setIndexNumber] = useState("");
@@ -39,7 +41,7 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!formData.address || !formData.nicNumber || !formData.alBatch || !formData.school) {
+    if (!formData.address || !formData.nicNumber || !formData.alBatch || !formData.school || !formData.phoneNumber) {
       setLocalError("Please fill in all required fields");
       return;
     }
@@ -59,6 +61,14 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 text-center">
+          <Image
+            src="/logo.jpeg"
+            alt="UGEMS Logo"
+            width={80}
+            height={80}
+            className="mx-auto mb-4 rounded-lg"
+            priority
+          />
           <div className="text-4xl font-bold text-green-600 mb-4">✓</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome!</h1>
           <p className="text-gray-600 mb-6">Your registration was successful</p>
@@ -78,8 +88,18 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">UGEMS</h1>
-        <p className="text-gray-600 mb-6">Student Registration</p>
+        <div className="flex justify-center mb-4">
+          <Image
+            src="/logo.jpeg"
+            alt="UGEMS Logo"
+            width={80}
+            height={80}
+            className="rounded-lg"
+            priority
+          />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">UGEMS</h1>
+        <p className="text-gray-600 mb-6 text-center">Student Registration</p>
 
         {(error || localError) && (
           <div className="bg-red-50 text-red-700 p-4 rounded-md mb-4">
@@ -214,6 +234,21 @@ export default function RegisterPage() {
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="Street address"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="+94 77 XXX XXXX or 0777 XXX XXX"
               />
             </div>
           </div>

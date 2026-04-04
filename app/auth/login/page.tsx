@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 
@@ -36,8 +37,18 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">UGEMS</h1>
-        <p className="text-gray-600 mb-6">Sign in to your account</p>
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/logo.jpeg"
+            alt="UGEMS Logo"
+            width={100}
+            height={100}
+            className="rounded-lg"
+            priority
+          />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">UGEMS</h1>
+        <p className="text-gray-600 mb-6 text-center">Sign in to your account</p>
 
         {(error || localError) && (
           <div className="bg-red-50 text-red-700 p-4 rounded-md mb-4">
