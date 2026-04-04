@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import useAuthStore from "@/lib/authStore";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import useAuthStore from '@/lib/authStore';
 
 export default function Home() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     useAuthStore.getState().init();
     if (token) {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   }, [token, router]);
 
@@ -23,17 +23,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-indigo-600">UGEMS</div>
           <div className="flex gap-4">
-            <Link
-              href="/admin/login"
-              className="px-4 py-2 text-amber-600 hover:text-amber-700 font-semibold"
-              title="Admin Access"
-            >
-              🔐 Admin
-            </Link>
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 text-indigo-600 hover:text-indigo-700"
-            >
+            <Link href="/auth/login" className="px-4 py-2 text-indigo-600 hover:text-indigo-700">
               Sign In
             </Link>
             <Link
@@ -52,9 +42,7 @@ export default function Home() {
           Undergraduate Engineering & Medicine Society
         </h1>
         <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-          A comprehensive digital ecosystem for undergraduate students in
-          Engineering and Medicine. Access resources, take quizzes, and
-          collaborate with your peers.
+          A comprehensive digital ecosystem for undergraduate students in Engineering and Medicine. Access resources, take quizzes, and collaborate with your peers.
         </p>
 
         <div className="flex gap-4 justify-center mb-16">
@@ -76,34 +64,25 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
           <div className="bg-white p-8 rounded-lg shadow">
             <div className="text-4xl mb-4">📚</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Study Resources
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Study Resources</h3>
             <p className="text-gray-600">
-              Share and access comprehensive study materials from your peers and
-              instructors.
+              Share and access comprehensive study materials from your peers and instructors.
             </p>
           </div>
 
           <div className="bg-white p-8 rounded-lg shadow">
             <div className="text-4xl mb-4">🎯</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Interactive Quizzes
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Interactive Quizzes</h3>
             <p className="text-gray-600">
-              Test your knowledge with timed quizzes and get instant feedback on
-              your performance.
+              Test your knowledge with timed quizzes and get instant feedback on your performance.
             </p>
           </div>
 
           <div className="bg-white p-8 rounded-lg shadow">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Collaborate
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Collaborate</h3>
             <p className="text-gray-600">
-              Connect with other students and instructors in a vibrant academic
-              community.
+              Connect with other students and instructors in a vibrant academic community.
             </p>
           </div>
         </div>
