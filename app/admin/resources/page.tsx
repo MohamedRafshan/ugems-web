@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 import { adminAPI, resourceAPI } from "@/lib/api";
 import AdminSidebar from "@/components/AdminSidebar";
+import { isLimitedAdmin, canToggleContent } from "@/lib/permissions";
 
 export default function AdminResources() {
   const router = useRouter();
@@ -65,7 +66,12 @@ export default function AdminResources() {
     }
   };
 
-  const filteredResources = resources.filter(
+  // For limited admins, filter to show only their own resources
+  const displayedResources = isLimitedAdmin(user)
+    ? resources.filter((r: any) => r.uploadedBy === user._id)
+    : resources;
+
+  const filteredResources = displayedResources.filter(
     (resource: any) =>
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.subject.toLowerCase().includes(searchTerm.toLowerCase())
@@ -91,7 +97,7 @@ export default function AdminResources() {
           <div className="px-8 py-4">
             <h1 className="text-3xl font-bold text-gray-900">Resources</h1>
             <p className="text-gray-600 mt-1">
-              Manage all study materials on the platform
+              {isLimitedAdmin(user) ? "Manage your study materials" : "Manage all study materials on the platform"}
             </p>
           </div>
         </div>
@@ -162,71 +168,78 @@ export default function AdminResources() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredResources.map((resource: any) => (
-                      <tr
-                        key={resource._id}
-                        className="border-b border-gray-200 hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900">
-                          {resource.title}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {resource.subject}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {resource.category}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {resource.downloads || 0}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              resource.isEnabled
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {resource.isEnabled ? "✓ Enabled" : "✗ Disabled"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              resource.isHidden
-                                ? "bg-gray-100 text-gray-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {resource.isHidden ? "👁️ Hidden" : "👀 Visible"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleToggleEnable(resource._id)}
-                              className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                    {filteredResources.map((resource: any) => {
+                      const canModify = canToggleContent(user, resource.uploadedBy);
+                      return (
+                        <tr
+                          key={resource._id}
+                          className="border-b border-gray-200 hover:bg-gray-50"
+                        >
+                          <td className="px-6 py-4 font-medium text-gray-900">
+                            {resource.title}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {resource.subject}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {resource.category}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {resource.downloads || 0}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                 resource.isEnabled
-                                  ? "bg-orange-100 hover:bg-orange-200 text-orange-800"
-                                  : "bg-green-100 hover:bg-green-200 text-green-800"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
                               }`}
                             >
-                              {resource.isEnabled ? "Disable" : "Enable"}
-                            </button>
-                            <button
-                              onClick={() => handleToggleHide(resource._id)}
-                              className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                              {resource.isEnabled ? "✓ Enabled" : "✗ Disabled"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                 resource.isHidden
-                                  ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
-                                  : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                  ? "bg-gray-100 text-gray-800"
+                                  : "bg-blue-100 text-blue-800"
                               }`}
                             >
-                              {resource.isHidden ? "Show" : "Hide"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              {resource.isHidden ? "👁️ Hidden" : "👀 Visible"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {canModify ? (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleToggleEnable(resource._id)}
+                                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                                    resource.isEnabled
+                                      ? "bg-orange-100 hover:bg-orange-200 text-orange-800"
+                                      : "bg-green-100 hover:bg-green-200 text-green-800"
+                                  }`}
+                                >
+                                  {resource.isEnabled ? "Disable" : "Enable"}
+                                </button>
+                                <button
+                                  onClick={() => handleToggleHide(resource._id)}
+                                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                                    resource.isHidden
+                                      ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
+                                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                  }`}
+                                >
+                                  {resource.isHidden ? "Show" : "Hide"}
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">No access</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

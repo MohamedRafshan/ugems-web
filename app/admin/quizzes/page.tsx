@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 import { adminAPI, quizAPI } from "@/lib/api";
 import AdminSidebar from "@/components/AdminSidebar";
+import { isLimitedAdmin, canToggleContent } from "@/lib/permissions";
 
 export default function AdminQuizzes() {
   const router = useRouter();
@@ -65,7 +66,12 @@ export default function AdminQuizzes() {
     }
   };
 
-  const filteredQuizzes = quizzes.filter(
+  // For limited admins, filter to show only their own quizzes
+  const displayedQuizzes = isLimitedAdmin(user)
+    ? quizzes.filter((q: any) => q.createdBy === user._id)
+    : quizzes;
+
+  const filteredQuizzes = displayedQuizzes.filter(
     (quiz: any) =>
       quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       quiz.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -91,7 +97,7 @@ export default function AdminQuizzes() {
           <div className="px-8 py-4">
             <h1 className="text-3xl font-bold text-gray-900">Quizzes</h1>
             <p className="text-gray-600 mt-1">
-              Manage all quizzes on the platform
+              {isLimitedAdmin(user) ? "Manage your quizzes" : "Manage all quizzes on the platform"}
             </p>
           </div>
         </div>
@@ -165,74 +171,81 @@ export default function AdminQuizzes() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredQuizzes.map((quiz: any) => (
-                      <tr
-                        key={quiz._id}
-                        className="border-b border-gray-200 hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900">
-                          {quiz.title}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {quiz.category}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {quiz.questions?.length || 0}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {quiz.timeLimit} mins
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {quiz.attemptLimit}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              quiz.isEnabled
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {quiz.isEnabled ? "✓ Enabled" : "✗ Disabled"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              quiz.isHidden
-                                ? "bg-gray-100 text-gray-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {quiz.isHidden ? "👁️ Hidden" : "👀 Visible"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleToggleEnable(quiz._id)}
-                              className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                    {filteredQuizzes.map((quiz: any) => {
+                      const canModify = canToggleContent(user, quiz.createdBy);
+                      return (
+                        <tr
+                          key={quiz._id}
+                          className="border-b border-gray-200 hover:bg-gray-50"
+                        >
+                          <td className="px-6 py-4 font-medium text-gray-900">
+                            {quiz.title}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {quiz.category}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {quiz.questions?.length || 0}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {quiz.timeLimit} mins
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {quiz.attemptLimit}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                 quiz.isEnabled
-                                  ? "bg-orange-100 hover:bg-orange-200 text-orange-800"
-                                  : "bg-green-100 hover:bg-green-200 text-green-800"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
                               }`}
                             >
-                              {quiz.isEnabled ? "Disable" : "Enable"}
-                            </button>
-                            <button
-                              onClick={() => handleToggleHide(quiz._id)}
-                              className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                              {quiz.isEnabled ? "✓ Enabled" : "✗ Disabled"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                 quiz.isHidden
-                                  ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
-                                  : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                  ? "bg-gray-100 text-gray-800"
+                                  : "bg-blue-100 text-blue-800"
                               }`}
                             >
-                              {quiz.isHidden ? "Show" : "Hide"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              {quiz.isHidden ? "👁️ Hidden" : "👀 Visible"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {canModify ? (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleToggleEnable(quiz._id)}
+                                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                                    quiz.isEnabled
+                                      ? "bg-orange-100 hover:bg-orange-200 text-orange-800"
+                                      : "bg-green-100 hover:bg-green-200 text-green-800"
+                                  }`}
+                                >
+                                  {quiz.isEnabled ? "Disable" : "Enable"}
+                                </button>
+                                <button
+                                  onClick={() => handleToggleHide(quiz._id)}
+                                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                                    quiz.isHidden
+                                      ? "bg-blue-100 hover:bg-blue-200 text-blue-800"
+                                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                  }`}
+                                >
+                                  {quiz.isHidden ? "Show" : "Hide"}
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">No access</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

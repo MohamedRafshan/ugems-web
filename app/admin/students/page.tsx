@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 import { adminAPI } from "@/lib/api";
 import AdminSidebar from "@/components/AdminSidebar";
+import { isSuperAdmin } from "@/lib/permissions";
 
 export default function AdminStudents() {
   const router = useRouter();
@@ -18,6 +19,12 @@ export default function AdminStudents() {
   const [roleFilter, setRoleFilter] = useState("all"); // all, admin, student
 
   useEffect(() => {
+    // Only super admin can access this page
+    if (user && !isSuperAdmin(user)) {
+      router.push("/admin/resources");
+      return;
+    }
+
     if (user && user.role !== "admin") {
       router.push("/dashboard");
       return;
@@ -368,7 +375,7 @@ export default function AdminStudents() {
             <p className="text-sm text-blue-900">
               <strong>💡 Tip:</strong> Use filters to find specific users quickly.
               Active users can access the system. Inactive users cannot access.
-              Admins have full platform control. Click "Make Admin" to promote a student.
+              Admins have limited admin capabilities. Click "Make Admin" to promote a student.
             </p>
             <p className="text-xs text-blue-800 mt-2 font-semibold">
               🔐 Note: The main super admin account is protected and cannot be modified.

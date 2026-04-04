@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuthStore from "@/lib/authStore";
 import { adminAPI } from "@/lib/api";
 import AdminSidebar from "@/components/AdminSidebar";
+import { isSuperAdmin } from "@/lib/permissions";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user && user.role !== "admin") {
+    if (user && !isSuperAdmin(user)) {
       router.push("/dashboard");
       return;
     }

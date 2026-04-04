@@ -7,6 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   role: "student" | "lecturer" | "admin";
+  adminTier?: "super" | "limited" | null;
 }
 
 interface AuthStore {
