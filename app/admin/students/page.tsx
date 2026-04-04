@@ -57,11 +57,23 @@ export default function AdminStudents() {
     }
   };
 
+  const handleMakeLecturer = async (id: string) => {
+    try {
+      setSuccess("");
+      await adminAPI.updateUserRole(id, "lecturer");
+      setSuccess("Student promoted to lecturer successfully");
+      loadStudents();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to update role");
+    }
+  };
+
   const handleRemoveAdmin = async (id: string) => {
     try {
       setSuccess("");
       await adminAPI.updateUserRole(id, "student");
-      setSuccess("Admin role removed successfully");
+      setSuccess("Admin/Lecturer role removed successfully");
       loadStudents();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err: any) {
@@ -104,6 +116,7 @@ export default function AdminStudents() {
     const matchRole =
       roleFilter === "all" ||
       (roleFilter === "admin" && student.role === "admin") ||
+      (roleFilter === "lecturer" && student.role === "lecturer") ||
       (roleFilter === "student" && student.role === "student");
 
     return matchSearch && matchStatus && matchRole;
@@ -218,6 +231,7 @@ export default function AdminStudents() {
                 >
                   <option value="all">All Roles</option>
                   <option value="admin">Admin Only</option>
+                  <option value="lecturer">Lecturer Only</option>
                   <option value="student">Students Only</option>
                 </select>
               </div>
@@ -297,10 +311,16 @@ export default function AdminStudents() {
                             className={`px-3 py-1 rounded-full text-sm font-semibold ${
                               student.role === "admin"
                                 ? "bg-purple-100 text-purple-800"
+                                : student.role === "lecturer"
+                                ? "bg-orange-100 text-orange-800"
                                 : "bg-blue-100 text-blue-800"
                             }`}
                           >
-                            {student.role === "admin" ? "👑 Admin" : "👥 Student"}
+                            {student.role === "admin"
+                              ? "👑 Admin"
+                              : student.role === "lecturer"
+                              ? "👨‍🏫 Lecturer"
+                              : "👥 Student"}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -319,24 +339,41 @@ export default function AdminStudents() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-1 flex-wrap">
-                            {/* Make/Remove Admin Button */}
-                            {student.role === "admin" ? (
+                            {/* Role Management Buttons */}
+                            {student.role === "student" ? (
+                              <>
+                                <button
+                                  onClick={() => handleMakeAdmin(student._id)}
+                                  className="px-2 py-1 rounded text-xs font-semibold bg-purple-100 hover:bg-purple-200 text-purple-800 transition"
+                                  title="Promote to admin"
+                                >
+                                  Make Admin
+                                </button>
+                                <button
+                                  onClick={() => handleMakeLecturer(student._id)}
+                                  className="px-2 py-1 rounded text-xs font-semibold bg-orange-100 hover:bg-orange-200 text-orange-800 transition"
+                                  title="Promote to lecturer"
+                                >
+                                  Make Lecturer
+                                </button>
+                              </>
+                            ) : student.role === "admin" ? (
                               <button
                                 onClick={() => handleRemoveAdmin(student._id)}
-                                className="px-2 py-1 rounded text-xs font-semibold bg-orange-100 hover:bg-orange-200 text-orange-800 transition"
+                                className="px-2 py-1 rounded text-xs font-semibold bg-red-100 hover:bg-red-200 text-red-800 transition"
                                 title="Remove admin role"
                               >
                                 Remove Admin
                               </button>
-                            ) : (
+                            ) : student.role === "lecturer" ? (
                               <button
-                                onClick={() => handleMakeAdmin(student._id)}
-                                className="px-2 py-1 rounded text-xs font-semibold bg-purple-100 hover:bg-purple-200 text-purple-800 transition"
-                                title="Make this user admin"
+                                onClick={() => handleRemoveAdmin(student._id)}
+                                className="px-2 py-1 rounded text-xs font-semibold bg-red-100 hover:bg-red-200 text-red-800 transition"
+                                title="Remove lecturer role"
                               >
-                                Make Admin
+                                Remove Lecturer
                               </button>
-                            )}
+                            ) : null}
 
                             {/* Activate/Deactivate Button */}
                             {student.isActive ? (
@@ -375,7 +412,7 @@ export default function AdminStudents() {
             <p className="text-sm text-blue-900">
               <strong>💡 Tip:</strong> Use filters to find specific users quickly.
               Active users can access the system. Inactive users cannot access.
-              Admins have limited admin capabilities. Click "Make Admin" to promote a student.
+              Promote students to Admin or Lecturer to give them special access. Click "Remove Admin" or "Remove Lecturer" to demote them back to student.
             </p>
             <p className="text-xs text-blue-800 mt-2 font-semibold">
               🔐 Note: The main super admin account is protected and cannot be modified.

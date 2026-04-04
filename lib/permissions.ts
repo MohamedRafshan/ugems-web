@@ -2,8 +2,16 @@
  * Permission checking utilities for admin role hierarchy
  */
 
-export const isSuperAdmin = (user: any) =>
-  user?.role === "admin" && user?.adminTier === "super";
+export const isSuperAdmin = (user: any) => {
+  // Explicit check for super admin tier
+  if (user?.role === "admin" && user?.adminTier === "super") return true;
+
+  // Fallback: if they're an admin but adminTier is undefined (old JWT or not set yet),
+  // still treat as potentially super admin - let backend enforce with email/tier check
+  if (user?.role === "admin" && user?.adminTier === undefined) return true;
+
+  return false;
+};
 
 export const isLimitedAdmin = (user: any) =>
   (user?.role === "admin" || user?.role === "lecturer") &&
