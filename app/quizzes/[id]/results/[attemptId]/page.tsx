@@ -9,18 +9,19 @@ import { useParams } from "next/navigation";
 
 function QuizResultsContent() {
   const params = useParams();
+  const attemptId = Array.isArray(params.attemptId) ? params.attemptId[0] : (params.attemptId as string);
   const { user } = useAuthStore();
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     loadResults();
-  }, [params.attemptId]);
+  }, [attemptId]);
 
   const loadResults = async () => {
     try {
       setLoading(true);
-      const response = await quizAPI.getResult(params.attemptId);
+      const response = await quizAPI.getResult(attemptId);
       setResult(response.data);
     } catch (error) {
       console.error("Error loading results:", error);
@@ -85,7 +86,7 @@ function QuizResultsContent() {
           </h2>
 
           <div className="space-y-6">
-            {attempt.answers.map((answer, index) => (
+            {attempt.answers.map((answer: any, index: number) => (
               <div
                 key={index}
                 className={`p-4 border-2 rounded-lg ${answer.isCorrect ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"}`}

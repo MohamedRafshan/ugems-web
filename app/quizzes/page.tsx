@@ -8,8 +8,8 @@ import { quizAPI } from "@/lib/api";
 
 function QuizzesBrowseContent() {
   const { user } = useAuthStore();
-  const [quizzes, setQuizzes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState({ category: "", search: "" });
 
   useEffect(() => {

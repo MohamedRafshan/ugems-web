@@ -67,8 +67,8 @@ export default function AdminQuizzes() {
   };
 
   // For limited admins, filter to show only their own quizzes
-  const displayedQuizzes = isLimitedAdmin(user)
-    ? quizzes.filter((q: any) => q.createdBy === user._id)
+  const displayedQuizzes = user && isLimitedAdmin(user)
+    ? quizzes.filter((q: any) => q.createdBy === user.id)
     : quizzes;
 
   const filteredQuizzes = displayedQuizzes.filter(

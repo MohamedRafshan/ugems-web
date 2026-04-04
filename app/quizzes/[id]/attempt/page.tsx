@@ -10,18 +10,19 @@ import { useParams } from "next/navigation";
 function QuizAttemptContent() {
   const router = useRouter();
   const params = useParams();
+  const quizId = Array.isArray(params.id) ? params.id[0] : (params.id as string);
   const { user } = useAuthStore();
-  const [quiz, setQuiz] = useState(null);
-  const [attempt, setAttempt] = useState(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [quiz, setQuiz] = useState<any>(null);
+  const [attempt, setAttempt] = useState<any>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     loadQuiz();
-  }, [params.id]);
+  }, [quizId]);
 
   useEffect(() => {
     if (!timeLeft || !attempt) return;
@@ -42,11 +43,11 @@ function QuizAttemptContent() {
   const loadQuiz = async () => {
     try {
       setLoading(true);
-      const quizResponse = await quizAPI.getById(params.id);
+      const quizResponse = await quizAPI.getById(quizId);
       setQuiz(quizResponse.data.quiz);
 
       // Start attempt
-      const attemptResponse = await quizAPI.startAttempt(params.id);
+      const attemptResponse = await quizAPI.startAttempt(quizId);
       setAttempt(attemptResponse.data.attempt);
       setTimeLeft(quizResponse.data.quiz.timeLimit * 60);
     } catch (error) {
@@ -56,11 +57,13 @@ function QuizAttemptContent() {
     }
   };
 
-  const handleAnswerChange = (questionId, answer) => {
+  const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers({ ...answers, [questionId]: answer });
   };
 
   const handleSubmit = async () => {
+    if (!attempt) return;
+
     try {
       setSubmitting(true);
       const submissionData = {
@@ -73,11 +76,11 @@ function QuizAttemptContent() {
       };
 
       const response = await quizAPI.submit(
-        params.id,
+        quizId,
         attempt._id,
         submissionData,
       );
-      router.push(`/quizzes/${params.id}/results/${response.data.attempt._id}`);
+      router.push(`/quizzes/${quizId}/results/${response.data.attempt._id}`);
     } catch (error) {
       console.error("Error submitting quiz:", error);
     } finally {
@@ -139,7 +142,7 @@ function QuizAttemptContent() {
 
           {/* Options */}
           <div className="space-y-3 mb-8">
-            {currentQuestion.options.map((option, index) => (
+            {currentQuestion.options.map((option: any, index: number) => (
               <label
                 key={index}
                 className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"

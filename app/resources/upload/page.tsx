@@ -20,17 +20,17 @@ function ResourceUploadContent() {
   });
   const [file, setFile] = useState(null);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     setError("");
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: any) => {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     if (!file) {
@@ -50,7 +50,7 @@ function ResourceUploadContent() {
 
       await resourceAPI.upload(data);
       router.push("/resources");
-    } catch (error) {
+    } catch (error: any) {
       setError(error.response?.data?.message || "Upload failed");
     } finally {
       setLoading(false);
@@ -97,7 +97,7 @@ function ResourceUploadContent() {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              rows="4"
+              rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Describe the resource..."
             />

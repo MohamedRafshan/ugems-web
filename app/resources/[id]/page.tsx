@@ -11,22 +11,25 @@ import { useParams } from "next/navigation";
 function ResourceDetailContent() {
   const router = useRouter();
   const params = useParams();
+  const resourceId = Array.isArray(params.id)
+    ? params.id[0]
+    : (params.id as string);
   const { user } = useAuthStore();
-  const [resource, setResource] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [newComment, setNewComment] = useState("");
-  const [rating, setRating] = useState(0);
-  const [comments, setComments] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
+  const [resource, setResource] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [newComment, setNewComment] = useState<string>("");
+  const [rating, setRating] = useState<number>(0);
+  const [comments, setComments] = useState<any[]>([]);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     loadResource();
-  }, [params.id]);
+  }, [resourceId]);
 
   const loadResource = async () => {
     try {
       setLoading(true);
-      const response = await resourceAPI.getById(params.id);
+      const response = await resourceAPI.getById(resourceId);
       setResource(response.data.resource);
       setComments(response.data.resource.comments || []);
     } catch (error) {
@@ -36,13 +39,13 @@ function ResourceDetailContent() {
     }
   };
 
-  const handleAddComment = async (e) => {
+  const handleAddComment = async (e: any) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
     try {
       setSubmitting(true);
-      await resourceAPI.comment(params.id, { content: newComment });
+      await resourceAPI.comment(resourceId, { content: newComment });
       setNewComment("");
       loadResource();
     } catch (error) {
@@ -52,9 +55,9 @@ function ResourceDetailContent() {
     }
   };
 
-  const handleRate = async (stars) => {
+  const handleRate = async (stars: any) => {
     try {
-      await resourceAPI.rate(params.id, { rating: stars });
+      await resourceAPI.rate(resourceId, { rating: stars });
       setRating(stars);
       loadResource();
     } catch (error) {
@@ -64,11 +67,11 @@ function ResourceDetailContent() {
 
   const handleDownload = async () => {
     try {
-      const response = await resourceAPI.download(params.id);
+      const response = await resourceAPI.download(resourceId);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `resource-${params.id}.pdf`);
+      link.setAttribute("download", `resource-${resourceId}.pdf`);
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -80,7 +83,7 @@ function ResourceDetailContent() {
     if (!confirm("Are you sure you want to delete this resource?")) return;
 
     try {
-      await resourceAPI.delete(params.id);
+      await resourceAPI.delete(resourceId);
       router.push("/resources");
     } catch (error) {
       console.error("Error deleting resource:", error);

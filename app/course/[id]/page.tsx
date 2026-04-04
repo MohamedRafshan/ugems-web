@@ -11,7 +11,7 @@ import { isAdmin } from "@/lib/permissions";
 function CourseDetailContent() {
   const router = useRouter();
   const params = useParams();
-  const courseId = params.id;
+  const courseId = Array.isArray(params.id) ? params.id[0] : (params.id as string);
   const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState("course");
   const [expandedSections, setExpandedSections] = useState<number[]>([0]);

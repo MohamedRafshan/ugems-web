@@ -10,8 +10,8 @@ import { resourceAPI } from "@/lib/api";
 function ResourcesBrowseContent() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const [resources, setResources] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [resources, setResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState({
     subject: "",
     category: "",
@@ -34,12 +34,12 @@ function ResourcesBrowseContent() {
     }
   };
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleDownload = async (id) => {
+  const handleDownload = async (id: string) => {
     try {
       const response = await resourceAPI.download(id);
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -48,7 +48,7 @@ function ResourcesBrowseContent() {
       link.setAttribute("download", `resource-${id}.pdf`);
       document.body.appendChild(link);
       link.click();
-      link.parentElement.removeChild(link);
+      link.parentElement?.removeChild(link);
     } catch (error) {
       console.error("Download failed:", error);
     }

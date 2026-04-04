@@ -67,8 +67,8 @@ export default function AdminResources() {
   };
 
   // For limited admins, filter to show only their own resources
-  const displayedResources = isLimitedAdmin(user)
-    ? resources.filter((r: any) => r.uploadedBy === user._id)
+  const displayedResources = user && isLimitedAdmin(user)
+    ? resources.filter((r: any) => r.uploadedBy === user.id)
     : resources;
 
   const filteredResources = displayedResources.filter(
